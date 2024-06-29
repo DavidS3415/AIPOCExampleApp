@@ -1,0 +1,72 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureServiceConnection: $(AzureServiceConnectionName)
+  azureSubscription: $(AzureSubscriptionId)
+  resourceGroup: 'example-test1'
+  location: 'West US 2'
+  appServicePlan: 'DSafran_asp_7391'
+  flaskAppName: 'test-exampleapp-s3ai-version002'
+  reactStorageAccount: 's3aiversion002'
+
+jobs:
+- job: DeployInfrastructure
+  displayName: 'Deploy Infrastructure'
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: $(azureServiceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az group create --name $(resourceGroup) --location $(location)
+
+        # Create App Service Plan
+        az appservice plan create --name $(appServicePlan) --resource-group $(resourceGroup) --sku B1 --is-linux
+
+        # Create Flask Web App
+        az webapp create --name $(flaskAppName) --resource-group $(resourceGroup) --plan $(appServicePlan) --runtime "PYTHON|3.12"
+
+        # Create Storage Account for React App
+        az storage account create --name $(reactStorageAccount) --resource-group $(resourceGroup) --location $(location) --sku Standard_LRS
+
+- job: BuildAndDeploy
+  dependsOn: DeployInfrastructure
+  displayName: 'Build and Deploy Applications'
+  steps:
+  - checkout: self
+
+  - task: Python@0
+    displayName: 'Install Python Dependencies'
+    inputs:
+      command: 'pip'
+      arguments: 'install -r requirements.txt'
+      workingDirectory: 'src/backend'
+
+  - task: AzureWebApp@1
+    displayName: 'Deploy Flask API to Azure Web App'
+    inputs:
+      azureSubscription: $(azureServiceConnection)
+      appName: $(flaskAppName)
+      package: '$(System.DefaultWorkingDirectory)/src/backend'
+
+  - script: |
+      npm install
+      npm run build
+    displayName: 'Build React App'
+    workingDirectory: 'src/frontend'
+
+  - task: AzureCLI@2
+    displayName: 'Deploy React App to Azure Storage'
+    inputs:
+      azureSubscription: $(azureServiceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount)
