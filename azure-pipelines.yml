@@ -42,13 +42,6 @@ jobs:
   steps:
   - checkout: self
 
-  - task: Python@0
-    displayName: 'Install Python Dependencies'
-    inputs:
-      command: 'pip'
-      arguments: 'install -r requirements.txt'
-      workingDirectory: 'src/backend'
-
   - task: AzureWebApp@1
     displayName: 'Deploy Flask API to Azure Web App'
     inputs:
