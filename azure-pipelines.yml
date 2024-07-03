@@ -11,7 +11,7 @@ variables:
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'westus2'  # Correct location format
-  flaskAppName: 'test-exampleapp-s3ai-version002'
+  flaskAppName: 'test-exampleapp-s3ai-version003'
   reactStorageAccount: 's3aiversion002'
 
 jobs:
