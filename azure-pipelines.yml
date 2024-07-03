@@ -7,12 +7,15 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: 'example-app-test1'  # Ensure this matches your service connection name in Azure DevOps
+  azureServiceConnection: 'example-app-test1'  
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'westus2'  # Correct location format
+  appServicePlan: 'DSafranAsp7391'
   flaskAppName: 'test-exampleapp-s3ai-version003'
   reactStorageAccount: 's3aiversion002'
+  projectRoot: $(System.DefaultWorkingDirectory)
+  pythonVersion: '3.12'
 
 jobs:
 - job: DeployInfrastructure
@@ -26,24 +29,67 @@ jobs:
       inlineScript: |
         az group create --name $(resourceGroup) --location $(location)
 
+        # Create App Service Plan
+        az appservice plan create --name $(appServicePlan) --resource-group $(resourceGroup) --sku B1 --is-linux
+
+        # Create Flask Web App
+        az webapp create --name $(flaskAppName) --resource-group $(resourceGroup) --plan $(appServicePlan) --runtime "PYTHON|3.12"
+
+        # Set startup command for Flask App
+        az webapp config set --resource-group $(resourceGroup) --name $(flaskAppName) --startup-file "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+
         # Create Storage Account for React App
         az storage account create --name $(reactStorageAccount) --resource-group $(resourceGroup) --location $(location) --sku Standard_LRS
 
-- job: DeployFlaskApp
+- job: BuildFlaskApp
   dependsOn: DeployInfrastructure
-  displayName: 'Deploy Flask API to Azure Web App'
-  steps:
-  - checkout: self
+  displayName: 'Build Flask API'
+  - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        displayName: 'Use Python $(pythonVersion)'
+  - script: |
+       python -m venv antenv
+       source antenv/bin/activate
+       python -m pip install --upgrade pip
+       pip install setup
+       pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
+     workingDirectory: $(projectRoot)
+     displayName: "Install requirements"
+  - task: ArchiveFiles@2
+     displayName: 'Archive files'
+     inputs:
+       rootFolderOrFile: '$(projectRoot)'
+       includeRootFolder: false
+       archiveType: zip
+       archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+       replaceExistingArchive: true
 
-  - task: AzureCLI@2
-    displayName: 'Deploy Flask API using az webapp up'
-    inputs:
-      azureSubscription: $(azureServiceConnection)
-      scriptType: bash
-      scriptLocation: inlineScript
-      workingDirectory: 'src/backend'
-      inlineScript: |
-        az webapp up --name $(flaskAppName) --resource-group $(resourceGroup) --location $(location) --runtime "PYTHON:3.8"
+   - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+     displayName: 'Upload package'
+     artifact: drop
+
+- deployment: DeployFlaskApp
+  displayName: 'Deploy Flask API to Azure Web App'
+    pool:
+      vmImage: $(vmImageName)
+  environment: $(environmentName)
+  dependsOn: Build
+  condition: succeeded()
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+  - task: UsePythonVersion@0
+   inputs:
+     versionSpec: '$(pythonVersion)'
+   displayName: 'Use Python version'
+  - task: AzureWebApp@1
+      displayName: 'Deploy Azure Web App : $(flaskAppName)'
+      inputs:
+        azureSubscription: $(azureServiceConnectionId)
+        appName: $(webAppName)
+        package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
 
 - job: DeployReactApp
   dependsOn: DeployFlaskApp
