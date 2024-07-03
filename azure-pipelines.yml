@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: 'example-app-test1'  # Ensure this matches your service connection name in Azure DevOps
+  azureServiceConnection: 'example-app-test'  # Ensure this matches your service connection name in Azure DevOps
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'westus2'  # Correct location format
@@ -41,8 +41,9 @@ jobs:
       azureSubscription: $(azureServiceConnection)
       scriptType: bash
       scriptLocation: inlineScript
+      workingDirectory: 'src/backend'
       inlineScript: |
-        az webapp up --name $(flaskAppName) --resource-group $(resourceGroup) --location $(location) --runtime "PYTHON:3.12" --src-path "src/backend"
+        az webapp up --name $(flaskAppName) --resource-group $(resourceGroup) --location $(location) --runtime "PYTHON:3.8"
 
 - job: DeployReactApp
   dependsOn: DeployFlaskApp
