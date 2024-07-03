@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: 'example-app-test'  # Ensure this matches your service connection name in Azure DevOps
+  azureServiceConnection: 'example-app-test1'  # Ensure this matches your service connection name in Azure DevOps
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'westus2'  # Correct location format
