@@ -10,12 +10,13 @@ variables:
   azureServiceConnection: 'example-app-test1'  
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
-  location: 'westus2'  # Correct location format
+  location: 'westus2'
   appServicePlan: 'DSafranAsp7391'
   flaskAppName: 'test-exampleapp-s3ai-version003'
   reactStorageAccount: 's3aiversion002'
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: '3.12'
+  environmentName: 'example_app_test_env_001'  
 
 jobs:
 - job: DeployInfrastructure
