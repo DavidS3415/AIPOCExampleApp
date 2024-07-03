@@ -10,8 +10,8 @@ variables:
   azureServiceConnection: 'example-app-test1'
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
-  location: 'West US 2'
-  appServicePlan: 'DSafran_asp_7391'
+  location: 'westus2'
+  appServicePlan: 'test_appgroup_example_app_S3ai_v1'
   flaskAppName: 'test-exampleapp-s3ai-version002'
   reactStorageAccount: 's3aiversion002'
 
