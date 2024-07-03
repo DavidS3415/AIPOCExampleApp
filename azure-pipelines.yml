@@ -44,65 +44,65 @@ jobs:
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
   displayName: 'Build Flask API'
+  steps:
   - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(pythonVersion)'
-        displayName: 'Use Python $(pythonVersion)'
+    inputs:
+      versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
   - script: |
        python -m venv antenv
        source antenv/bin/activate
        python -m pip install --upgrade pip
        pip install setup
        pip install --target="./.python_packages/lib/site-packages" -r ./requirements.txt
-     workingDirectory: $(projectRoot)
-     displayName: "Install requirements"
+    workingDirectory: $(projectRoot)
+    displayName: "Install requirements"
   - task: ArchiveFiles@2
-     displayName: 'Archive files'
-     inputs:
-       rootFolderOrFile: '$(projectRoot)'
-       includeRootFolder: false
-       archiveType: zip
-       archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-       replaceExistingArchive: true
-
-   - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-     displayName: 'Upload package'
-     artifact: drop
+    displayName: 'Archive files'
+    inputs:
+      rootFolderOrFile: '$(projectRoot)'
+      includeRootFolder: false
+      archiveType: zip
+      archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      replaceExistingArchive: true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifactName: drop
+      publishLocation: 'Container'
 
 - deployment: DeployFlaskApp
   displayName: 'Deploy Flask API to Azure Web App'
-    pool:
-      vmImage: $(vmImageName)
+  pool:
+    vmImage: $(vmImageName)
   environment: $(environmentName)
-  dependsOn: Build
+  dependsOn: BuildFlaskApp
   condition: succeeded()
   strategy:
     runOnce:
       deploy:
         steps:
-  - task: UsePythonVersion@0
-   inputs:
-     versionSpec: '$(pythonVersion)'
-   displayName: 'Use Python version'
-  - task: AzureWebApp@1
-      displayName: 'Deploy Azure Web App : $(flaskAppName)'
-      inputs:
-        azureSubscription: $(azureServiceConnectionId)
-        appName: $(webAppName)
-        package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '$(pythonVersion)'
+          displayName: 'Use Python version'
+        - task: AzureWebApp@1
+          displayName: 'Deploy Azure Web App : $(flaskAppName)'
+          inputs:
+            azureSubscription: $(azureServiceConnection)
+            appName: $(flaskAppName)
+            package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
 
 - job: DeployReactApp
   dependsOn: DeployFlaskApp
   displayName: 'Build and Deploy React Application'
   steps:
   - checkout: self
-
   - script: |
       npm install
       npm run build
     displayName: 'Build React App'
     workingDirectory: 'src/frontend'
-
   - task: AzureCLI@2
     displayName: 'Deploy React App to Azure Storage'
     inputs:
