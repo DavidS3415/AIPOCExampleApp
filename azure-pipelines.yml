@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: $(AzureServiceConnectionName)
+  azureServiceConnection: 'example-app-test1'
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'West US 2'
