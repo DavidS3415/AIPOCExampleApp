@@ -7,11 +7,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: 'example-app-test1'
+  azureServiceConnection: 'example-app-test1'  # Ensure this matches your service connection name in Azure DevOps
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
-  location: 'westus2'
-  appServicePlan: 'test_appgroup_example_app_S3ai_v1'
+  location: 'westus2'  # Correct location format
   flaskAppName: 'test-exampleapp-s3ai-version002'
   reactStorageAccount: 's3aiversion002'
 
@@ -27,27 +26,29 @@ jobs:
       inlineScript: |
         az group create --name $(resourceGroup) --location $(location)
 
-        # Create App Service Plan
-        az appservice plan create --name $(appServicePlan) --resource-group $(resourceGroup) --sku B1 --is-linux
-
-        # Create Flask Web App
-        az webapp create --name $(flaskAppName) --resource-group $(resourceGroup) --plan $(appServicePlan) --runtime "PYTHON|3.12"
-
         # Create Storage Account for React App
         az storage account create --name $(reactStorageAccount) --resource-group $(resourceGroup) --location $(location) --sku Standard_LRS
 
-- job: BuildAndDeploy
+- job: DeployFlaskApp
   dependsOn: DeployInfrastructure
-  displayName: 'Build and Deploy Applications'
+  displayName: 'Deploy Flask API to Azure Web App'
   steps:
   - checkout: self
 
-  - task: AzureWebApp@1
-    displayName: 'Deploy Flask API to Azure Web App'
+  - task: AzureCLI@2
+    displayName: 'Deploy Flask API using az webapp up'
     inputs:
       azureSubscription: $(azureServiceConnection)
-      appName: $(flaskAppName)
-      package: '$(System.DefaultWorkingDirectory)/src/backend'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az webapp up --name $(flaskAppName) --resource-group $(resourceGroup) --location $(location) --runtime "PYTHON:3.12" --src-path "src/backend"
+
+- job: DeployReactApp
+  dependsOn: DeployFlaskApp
+  displayName: 'Build and Deploy React Application'
+  steps:
+  - checkout: self
 
   - script: |
       npm install
