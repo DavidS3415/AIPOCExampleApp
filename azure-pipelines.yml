@@ -17,7 +17,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: '3.12'
   environmentName: 'example_app_test_env_001'
-  servicePrincipalId: $(ServicePrincipalId)
+  servicePrincipalId: '8124c907-76e0-411f-b932-5f53e223c953'
 
 jobs:
 - job: DeployInfrastructure
