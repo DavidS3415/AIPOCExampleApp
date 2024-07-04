@@ -45,9 +45,12 @@ jobs:
         # Create container for React App if it does not exist
         az storage container create --name '$web' --account-name $(reactStorageAccount)
 
-        # Assign Storage Blob Data Contributor role to the service principal
+        # Retrieve the service principal ID and export it as a variable
         servicePrincipalId=$(az ad sp list --display-name $(azureServiceConnection) --query "[0].objectId" --output tsv)
-        az role assignment create --assignee $(servicePrincipalId) --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
+        echo "Service Principal ID: $servicePrincipalId"
+
+        # Assign Storage Blob Data Contributor role to the service principal
+        az role assignment create --assignee "$servicePrincipalId" --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
 
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
