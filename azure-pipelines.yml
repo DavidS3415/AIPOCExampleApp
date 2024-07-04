@@ -74,8 +74,6 @@ jobs:
 
 - deployment: DeployFlaskApp
   displayName: 'Deploy Flask API to Azure Web App'
-  pool:
-    vmImage: $(vmImageName)
   environment: $(environmentName)
   dependsOn: BuildFlaskApp
   condition: succeeded()
