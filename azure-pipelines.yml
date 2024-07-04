@@ -113,6 +113,7 @@ jobs:
   - checkout: self
   - script: |
       echo "REACT_APP_API_URL=$(FlaskWebAppUrl)/users" > .env
+      cat .env
       npm install
       npm run build
     displayName: 'Build React App'
@@ -134,6 +135,9 @@ jobs:
   dependsOn: DeployReactApp
   displayName: 'Configure CORS for Flask API'
   steps:
+  - script: |
+      echo "ReactAppUrl: $(ReactAppUrl)"
+    displayName: 'Print React App URL for Debugging'
   - task: AzureCLI@2
     inputs:
       azureSubscription: $(azureServiceConnection)
