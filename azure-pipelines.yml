@@ -47,7 +47,7 @@ jobs:
 
         # Assign Storage Blob Data Contributor role to the service principal
         servicePrincipalId=$(az ad sp list --display-name $(azureServiceConnection) --query "[0].objectId" --output tsv)
-        az role assignment create --assignee $servicePrincipalId --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
+        az role assignment create --assignee $(servicePrincipalId) --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
 
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
