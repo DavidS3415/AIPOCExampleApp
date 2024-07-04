@@ -55,7 +55,7 @@ jobs:
        source antenv/bin/activate
        python -m pip install --upgrade pip
        pip install -r requirements.txt
-    workingDirectory: '$(projectRoot)/src/backend'  # Updated working directory
+    workingDirectory: '$(projectRoot)/src/backend'  
     displayName: "Install requirements"
   - script: |
        mkdir -p $(projectRoot)/src/backend/.python_packages/lib/site-packages
@@ -65,7 +65,7 @@ jobs:
   - task: ArchiveFiles@2
     displayName: 'Archive files'
     inputs:
-      rootFolderOrFile: '$(projectRoot)/src/backend'  # Updated root folder
+      rootFolderOrFile: '$(projectRoot)/src/backend'  
       includeRootFolder: false
       archiveType: zip
       archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
