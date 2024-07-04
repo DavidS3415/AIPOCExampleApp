@@ -17,7 +17,6 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: '3.12'
   environmentName: 'example_app_test_env_001'
-  servicePrincipalId: 'd9a663db-3f33-45ac-b7f5-3c5642d6cfe2'
 
 jobs:
 - job: DeployInfrastructure
@@ -45,9 +44,6 @@ jobs:
 
         # Create container for React App if it does not exist
         az storage container create --name '$web' --account-name $(reactStorageAccount)
-
-        # Assign Storage Blob Data Contributor role to the service principal
-        az role assignment create --assignee "$(servicePrincipalId)" --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
 
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
