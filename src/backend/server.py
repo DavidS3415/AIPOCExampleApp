@@ -12,8 +12,8 @@ app = Flask(__name__)
 #load client URI and allow CORS for it
 load_dotenv()
 client_uri = os.getenv('CLIENT_URI')
-#CORS(app, origins=[client_uri])
-CORS(app, origins="*")
+CORS(app, origins=[client_uri])
+#CORS(app, origins="*")
 
 # Load configuration
 app.config.from_object(Config)
