@@ -45,6 +45,10 @@ jobs:
         # Create container for React App if it does not exist
         az storage container create --name '$web' --account-name $(reactStorageAccount)
 
+        # Debug: List Service Principals and verify the connection name
+        echo "Listing all service principals:"
+        az ad sp list --query "[].{Name:displayName, ID:objectId}" -o table
+
         # Retrieve the service principal ID and export it as a variable
         servicePrincipalId=$(az ad sp list --display-name $(azureServiceConnection) --query "[0].objectId" --output tsv)
         echo "Service Principal ID: $servicePrincipalId"
