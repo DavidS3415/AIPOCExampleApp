@@ -127,22 +127,22 @@ jobs:
       inlineScript: |
         az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount) --auth-mode login
 
-        # Get the React app URL
-        reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
-        echo "##vso[task.setvariable variable=ReactAppUrl]$reactAppUrl"
+        # # Get the React app URL
+        # reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
+        # echo "##vso[task.setvariable variable=ReactAppUrl]$reactAppUrl"
 
-- job: ConfigureCors
-  dependsOn: DeployReactApp
-  displayName: 'Configure CORS for Flask API'
-  steps:
-  - script: |
-      echo "ReactAppUrl: $(ReactAppUrl)"
-    displayName: 'Print React App URL for Debugging'
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: $(azureServiceConnection)
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        # Set CLIENT_URI as an app setting for the Flask Web App
-        az webapp config appsettings set --resource-group $(resourceGroup) --name $(flaskAppName) --settings CLIENT_URI=$(ReactAppUrl)
+# - job: ConfigureCors
+#   dependsOn: DeployReactApp
+#   displayName: 'Configure CORS for Flask API'
+#   steps:
+#   - script: |
+#       echo "ReactAppUrl: $(ReactAppUrl)"
+#     displayName: 'Print React App URL for Debugging'
+#   - task: AzureCLI@2
+#     inputs:
+#       azureSubscription: $(azureServiceConnection)
+#       scriptType: bash
+#       scriptLocation: inlineScript
+#       inlineScript: |
+#         # Set CLIENT_URI as an app setting for the Flask Web App
+#         az webapp config appsettings set --resource-group $(resourceGroup) --name $(flaskAppName) --settings CLIENT_URI=$(ReactAppUrl)
