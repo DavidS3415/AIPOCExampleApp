@@ -16,7 +16,8 @@ variables:
   reactStorageAccount: 's3aiversion002'
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: '3.12'
-  environmentName: 'example_app_test_env_001'  
+  environmentName: 'example_app_test_env_001'
+  servicePrincipalId: $(ServicePrincipalId)
 
 jobs:
 - job: DeployInfrastructure
@@ -45,16 +46,8 @@ jobs:
         # Create container for React App if it does not exist
         az storage container create --name '$web' --account-name $(reactStorageAccount)
 
-        # Debug: List Service Principals and verify the connection name
-        echo "Listing all service principals:"
-        az ad sp list --query "[].{Name:displayName, ID:objectId}" -o table
-
-        # Retrieve the service principal ID and export it as a variable
-        servicePrincipalId=$(az ad sp list --display-name $(azureServiceConnection) --query "[0].objectId" --output tsv)
-        echo "Service Principal ID: $servicePrincipalId"
-
         # Assign Storage Blob Data Contributor role to the service principal
-        az role assignment create --assignee "$servicePrincipalId" --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
+        az role assignment create --assignee "$(servicePrincipalId)" --role "Storage Blob Data Contributor" --scope /subscriptions/$(azureSubscription)/resourceGroups/$(resourceGroup)/providers/Microsoft.Storage/storageAccounts/$(reactStorageAccount)
 
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
