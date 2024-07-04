@@ -42,6 +42,9 @@ jobs:
         # Create Storage Account for React App
         az storage account create --name $(reactStorageAccount) --resource-group $(resourceGroup) --location $(location) --sku Standard_LRS
 
+        # Create container for React App if it does not exist
+        az storage container create --name '$web' --account-name $(reactStorageAccount)
+
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
   displayName: 'Build Flask API'
@@ -113,4 +116,4 @@ jobs:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount)
+        az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount) --auth-mode login
