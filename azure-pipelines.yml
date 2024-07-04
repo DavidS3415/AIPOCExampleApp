@@ -37,7 +37,7 @@ jobs:
         az webapp create --name $(flaskAppName) --resource-group $(resourceGroup) --plan $(appServicePlan) --runtime "PYTHON|3.12"
 
         # Set startup command for Flask App
-        az webapp config set --resource-group $(resourceGroup) --name $(flaskAppName) --startup-file "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+        az webapp config set --resource-group $(resourceGroup) --name $(flaskAppName) --startup-file "gunicorn --bind=0.0.0.0 --timeout 600 server:app"
 
         # Create Storage Account for React App
         az storage account create --name $(reactStorageAccount) --resource-group $(resourceGroup) --location $(location) --sku Standard_LRS
