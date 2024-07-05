@@ -146,6 +146,10 @@ jobs:
       inlineScript: |
         # Get the React app URL
         reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
+        
+        # Remove trailing slash
+        reactAppUrl=${reactAppUrl%/}
+        
         echo "reactAppUrl is: $reactAppUrl"
 
         # Add CLIENT_URI environment variable
