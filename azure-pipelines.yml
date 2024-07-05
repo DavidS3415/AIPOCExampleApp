@@ -52,10 +52,7 @@ jobs:
         flaskWebAppUrl=$(az webapp show --name $(flaskAppName) --resource-group $(resourceGroup) --query defaultHostName --output tsv)
         echo "Retrieved Flask Web App URL: https://$flaskWebAppUrl"
         echo "##vso[task.setvariable variable=FlaskWebAppUrl;isOutput=true]https://$flaskWebAppUrl"
-        echo "Set FlaskWebAppUrl to: https://$flaskWebAppUrl"
-
-  outputs:
-    flaskWebAppUrl: $(FlaskWebAppUrl)
+    name: SetFlaskWebAppUrl
 
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
@@ -112,10 +109,10 @@ jobs:
             package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
 
 - job: DeployReactApp
-  dependsOn: DeployFlaskApp
+  dependsOn: DeployInfrastructure
   displayName: 'Build and Deploy React Application'
   variables:
-    FlaskWebAppUrl: $[dependencies.DeployInfrastructure.outputs['DeployInfrastructure.flaskWebAppUrl']]
+    FlaskWebAppUrl: $[ dependencies.DeployInfrastructure.outputs['SetFlaskWebAppUrl.FlaskWebAppUrl'] ]
   steps:
   - checkout: self
   - script: |
