@@ -112,7 +112,8 @@ jobs:
   steps:
   - checkout: self
   - script: |
-      echo "REACT_APP_API_URL=${{ variables.FlaskWebAppUrl }}/users" > .env
+      echo "FlaskWebAppUrl is: $(FlaskWebAppUrl)"
+      echo "REACT_APP_API_URL=$(FlaskWebAppUrl)/users" > .env
       cat .env
       npm install
       npm run build
