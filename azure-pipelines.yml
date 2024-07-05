@@ -54,6 +54,9 @@ jobs:
         echo "##vso[task.setvariable variable=FlaskWebAppUrl;isOutput=true]https://$flaskWebAppUrl"
         echo "Set FlaskWebAppUrl to: https://$flaskWebAppUrl"
 
+  outputs:
+    flaskWebAppUrl: $(FlaskWebAppUrl)
+
 - job: BuildFlaskApp
   dependsOn: DeployInfrastructure
   displayName: 'Build Flask API'
@@ -112,7 +115,7 @@ jobs:
   dependsOn: DeployFlaskApp
   displayName: 'Build and Deploy React Application'
   variables:
-    FlaskWebAppUrl: $[dependencies.DeployInfrastructure.outputs['FlaskWebAppUrl']]
+    FlaskWebAppUrl: $[dependencies.DeployInfrastructure.outputs['DeployInfrastructure.flaskWebAppUrl']]
   steps:
   - checkout: self
   - script: |
