@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureServiceConnection: 'example-app-test1'  
+  azureServiceConnection: 'example-app-test1'
   azureSubscription: $(AzureSubscriptionId)
   resourceGroup: 'example-test1'
   location: 'westus2'
@@ -65,7 +65,7 @@ jobs:
        source antenv/bin/activate
        python -m pip install --upgrade pip
        pip install -r requirements.txt
-    workingDirectory: '$(projectRoot)/src/backend'  
+    workingDirectory: '$(projectRoot)/src/backend'
     displayName: "Install requirements"
   - script: |
        mkdir -p $(projectRoot)/src/backend/.python_packages/lib/site-packages
@@ -75,7 +75,7 @@ jobs:
   - task: ArchiveFiles@2
     displayName: 'Archive files'
     inputs:
-      rootFolderOrFile: '$(projectRoot)/src/backend'  
+      rootFolderOrFile: '$(projectRoot)/src/backend'
       includeRootFolder: false
       archiveType: zip
       archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
@@ -125,11 +125,12 @@ jobs:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount) --auth-mode login
+        az storage blob upload-batch -s "$(System.DefaultWorkingDirectory)/src/frontend/build" -d '$web' --account-name $(reactStorageAccount) --auth-mode login --overwrite
 
-        # # Get the React app URL
-        # reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
-        # echo "##vso[task.setvariable variable=ReactAppUrl]$reactAppUrl"
+        # Get the React app URL
+        reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
+        echo "##vso[task.setvariable variable=ReactAppUrl]$reactAppUrl"
+
 
 # - job: ConfigureCors
 #   dependsOn: DeployReactApp
