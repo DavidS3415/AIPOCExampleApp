@@ -110,7 +110,6 @@ jobs:
 
 - job: DeployReactApp
   dependsOn: 
-    DeployFlaskApp
     DeployInfrastructure
   displayName: 'Build and Deploy React Application'
   variables:
