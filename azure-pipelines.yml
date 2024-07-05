@@ -109,8 +109,6 @@ jobs:
 - job: DeployReactApp
   dependsOn: DeployFlaskApp
   displayName: 'Build and Deploy React Application'
-  variables:
-    FlaskWebAppUrl: $(FlaskWebAppUrl)
   steps:
   - checkout: self
   - script: |
