@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>React API Example</h1>
+        <h1>React CICD Example</h1>
       </header>
       <main>
         <UserList />
