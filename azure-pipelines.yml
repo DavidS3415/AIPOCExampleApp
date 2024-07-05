@@ -146,7 +146,7 @@ jobs:
       inlineScript: |
         # Get the React app URL
         reactAppUrl=$(az storage account show --name $(reactStorageAccount) --query "primaryEndpoints.web" --output tsv)
-        echo "reactAppUrl is: $(reactAppUrl)"
+        echo "reactAppUrl is: $reactAppUrl"
 
         # Add CLIENT_URI environment variable
-        az webapp config appsettings set --resource-group $(resourceGroup) --name $(flaskAppName) --settings CLIENT_URI=$(reactAppUrl)
+        az webapp config appsettings set --resource-group $(resourceGroup) --name $(flaskAppName) --settings CLIENT_URI=$reactAppUrl
