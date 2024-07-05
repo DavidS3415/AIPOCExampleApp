@@ -109,7 +109,9 @@ jobs:
             package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
 
 - job: DeployReactApp
-  dependsOn: DeployInfrastructure
+  dependsOn: 
+    DeployFlaskApp
+    DeployInfrastructure
   displayName: 'Build and Deploy React Application'
   variables:
     FlaskWebAppUrl: $[ dependencies.DeployInfrastructure.outputs['SetFlaskWebAppUrl.FlaskWebAppUrl'] ]
