@@ -30,7 +30,6 @@ def live_server():
     env = os.environ.copy()
     server_process = subprocess.Popen([sys.executable, "server.py"], env=env)
     
-    # Wait for the server to start. You might want to add a more robust check.
     time.sleep(3)
     
     yield
@@ -43,7 +42,7 @@ def test_ui_add_user(driver, live_server):
     driver.get("http://localhost:5000/test")
     wait = WebDriverWait(driver, 10)
     
-    # Locate form inputs and submit button (adjust selectors based on your HTML)
+    # Locate form inputs and submit button
     name_input = driver.find_element(By.ID, "name")
     email_input = driver.find_element(By.ID, "email")
     submit_button = driver.find_element(By.XPATH, "//button[@type='submit']")
@@ -57,7 +56,7 @@ def test_ui_add_user(driver, live_server):
     email_input.send_keys(test_email)
     submit_button.click()
     
-    # Wait for the new user to appear in the list (the page updates via AJAX)
+    # Wait for the new user to appear in the list
     wait.until(EC.text_to_be_present_in_element((By.ID, "userList"), test_name))
     
     # Verify that the new user appears in the list

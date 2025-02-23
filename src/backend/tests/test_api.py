@@ -6,7 +6,7 @@ def test_get_users_empty(client):
     response = client.get('/users')
     assert response.status_code == 200
     data = json.loads(response.data)
-    assert data == []  # Assuming an empty list is returned initially
+    assert data == []  
 
 def test_create_user(client):
     new_user = {"name": "Test User", "email": "test@example.com"}
@@ -37,7 +37,7 @@ def test_get_user_by_id(client):
         content_type='application/json'
     )
     data = json.loads(response.data)
-    user_id = data.get('id')  # Assuming your endpoint returns an 'id' field
+    user_id = data.get('id')  
     
     # Retrieve the user by id
     response = client.get(f'/users/{user_id}')
