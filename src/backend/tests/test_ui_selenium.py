@@ -28,7 +28,7 @@ def driver():
 def live_server():
     # Use the current Python interpreter from the virtual environment.
     env = os.environ.copy()
-    server_process = subprocess.Popen([sys.executable, "server.py"], env=env)
+    server_process = subprocess.Popen([sys.executable, "./src/backend/server.py"], env=env)
     
     time.sleep(3)
     
