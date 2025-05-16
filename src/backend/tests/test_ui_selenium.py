@@ -39,7 +39,7 @@ def live_server():
 
 # Test that verifies the UI can submit a new user and that the user appears in the list.
 def test_ui_add_user(driver, live_server):
-    driver.get("http://localhost:5000/test")
+    driver.get("http://127.0.0.1:5000/test")
     wait = WebDriverWait(driver, 10)
     
     # Locate form inputs and submit button
